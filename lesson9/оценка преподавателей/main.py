@@ -41,6 +41,34 @@ def callback(call):
             )
             keyboard.row(btn)
 
+    if 'set_mark' in call.data and 'selected_teacher' in call.data:
+        with open('./db/teachers.json', 'r', encoding='UTF-8') as file:
+            teachers = json.load((file))
+        tn = int(call.data.split('=')[-1])
+        like = telebot.types.InlineKeyboardButton('лайк', callback_data=f'like={tn}')
+        dislike = telebot.types.InlineKeyboardButton('дизайк', callback_data=f'dis_like={tn}')
+        keyboard.row(like, dislike)
+
+        bot.edit_message_text(
+            chat_id=call.message.chat.id,
+            message_id=call.message.message_id,
+            text=f'преподаватель: {teachers[tn]["name"]} {teachers[tn]["lastname"]}\n'
+                 f'рейтинг преподавателя: {teachers[tn]["rating"]}'
+        )
+
+    if 'like' in call.data:
+        with open('./db/teachers.json', 'r', encoding='UTF-8') as file:
+            teachers = json.load((file))
+        tn = int(call.data.split('=')[-1])
+
+        if 'dis_like' in call.data:
+            teachers[tn]["rating"] -= 1
+        else:
+            teachers[tn]["rating"] += 1
+
+        with open('./db/teachers.json', 'w', encoding='UTF-8') as file:
+            json.dump(teachers, file, ensure_ascii=False, indent=4)
+        # handle_start(call.message)
 
     bot.edit_message_reply_markup(call.message.chat.id, call.message.id, reply_markup=keyboard)
 
