@@ -23,7 +23,7 @@ def todo_list_view(todo_list: Todolist) -> object:
     return message_text, kb
 
 
-def todo_meny_view(todo: Todo):
+def todo_menu_view(todo: Todo):
     kb = InlineKeyboardMarkup()
 
     btn_change_status = InlineKeyboardButton(

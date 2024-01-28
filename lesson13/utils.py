@@ -1,6 +1,5 @@
 import telebot.types
-
-from TODO.controllers import add_task
+from TODO.controllers import add_task, change_text
 from telebot.types import Message
 from telebot import TeleBot
 
@@ -31,4 +30,19 @@ def change_massage(
         chat_id=message.chat.id,
         message_id=message.message_id,
         reply_markup=kb
+    )
+
+def user_change_text(
+        message: Message,
+        bot: TeleBot,
+        task_id: int
+):
+    task_text = message.text
+    msg_text, kb = change_text(
+        user_id=message.from_user.id,
+        task_id=task_id,
+        text=task_text
+    )
+    bot.send_message(
+        chat_id=message.chat.id, text= msg_text, reply_markup=kb
     )

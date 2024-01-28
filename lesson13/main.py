@@ -1,8 +1,9 @@
+import utils
 from TODO import controllers
 from telebot import TeleBot
 from telebot.types import Message, CallbackQuery
 from constants import TOKEN, HELP_MESSAGE
-import utils
+from utils import change_massage, user_input_add_task
 
 bot = TeleBot(TOKEN)
 
@@ -20,10 +21,10 @@ def handle_callbacks(call: CallbackQuery):
     if call.data == 'add':
         bot.send_message(
             chat_id = call.message.chat.id,
-            text='ведите текст'
+            text='введите текст'
         )
         bot.register_next_step_handler(
-            call.message, utils.user_input_add_task, bot=bot
+            call.message, user_input_add_task, bot=bot
         )
     if 'view' in call.data:
         prefix, task_id = call.data.split('/')
@@ -44,7 +45,7 @@ def handle_callbacks(call: CallbackQuery):
 
     if call.data == 'back':
         content, kb = controllers.get_task_view(call.from_user.id)
-        utils.change_massage(
+        change_massage(
             message=call.message,
             bot=bot,
             text=content,
@@ -52,20 +53,41 @@ def handle_callbacks(call: CallbackQuery):
         )
     if 'delete' in call.data:
         prefix, task_id = call.data.split('/')
+        msg_text, kb = controllers.delete_task(
+            user_id=call.from_user.id,
+            task_id=int(task_id)
+        )
+        change_massage(
+            message=call.message,
+            bot=bot,
+            text=msg_text,
+            kb=kb
+        )
 
     if 'change_text' in call.data:
         prefix, task_id = call.data.split('/')
+        bot.send_message(
+            chat_id=call.message.chat.id,
+            text='введите текст'
+        )
+        bot.register_next_step_handler(
+            call.message,
+            utils.user_change_text,
+            bot=bot,
+            task_id=int(task_id)
+        )
+
 
     if 'change_status' in call.data:
         prefix, task_id = call.data.split('/')
         msg_text, kb = controllers.change_status(
-            user_id=call.message.from_user.id,
+            user_id=call.from_user.id,
             task_id=int(task_id)
         )
-        utils.change_massage(
+        change_massage(
             message=call.message,
             bot=bot,
-            text=content,
+            text=msg_text,
             kb=kb
         )
 

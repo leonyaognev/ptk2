@@ -1,5 +1,6 @@
 from database import Database
 
+
 class Todo:
     def __init__(self, id, user_id, text, status):
         self.id = id
@@ -8,24 +9,29 @@ class Todo:
         self.status = status
 
         self.__db = Database()
-    def chahge_status(self):
+
+    def change_status(self):
         if self.status == 1:
             self.status = 0
-        else: self.status = 1
+        else:
+            self.status = 1
 
-        self.__db.execute(f"""
-                update tasks set status  = {self.status}
-                where id = {self.id}
-                """)
+        self.__db.execute(
+            f"""
+                UPDATE tasks SET status = {self.status}
+                WHERE id = {self.id}
+            """
+        )
         self.__db.commit()
+
     def update(self, new_text):
         self.text = new_text
-
         self.__db.execute(f"""
-        update tasks set text = {self.text} 
-        where id = {self.id}
+            UPDATE tasks SET text = '{self.text}'
+            WHERE id = {self.id}
         """)
         self.__db.commit()
+
 
 class Todolist:
     def __init__(self, user_id):
@@ -36,32 +42,31 @@ class Todolist:
         self.__init_list()
 
     def __init_list(self):
-        qwery = self.__db.execute(f'select *from tasks where userId = {self.user_id}')
-        data = qwery.fetchall()
-
+        # получает из БД все задачи пользователя и добавляет объкты класса Todo в список
+        query = self.__db.execute(
+            f'SELECT * FROM tasks WHERE userId = {self.user_id}'
+        )
+        data = query.fetchall()
         for id, user_id, text, status in data:
-            self.tasks.append(Todo(id, user_id, text, status))
+            self.tasks.append(
+                Todo(id, user_id, text, status)
+            )
 
-    def add_text(self, new_text):
-        self.__db.execute(
-            f"""
-            insert into tasks (userId, text)
-            values ({self.user_id}, '{new_text}')
-            """)
+    def add_task(self, new_text):
+        self.__db.execute(f"""
+            INSERT INTO tasks (userId, text)
+            VALUES ({self.user_id}, '{new_text}')
+        """)
         self.__db.commit()
 
     def delete_task(self, task_id):
-        self.__db.execute(
-                f"""
-                delete from tasfs where id = {task_id}
-                """)
+        self.__db.execute(f"""
+            DELETE FROM tasks WHERE id = {task_id}
+        """)
         self.__db.commit()
 
     def get_task_by_id(self, task_id):
         for task in self.tasks:
             if task.id == task_id:
                 return task
-
         return None
-
-
