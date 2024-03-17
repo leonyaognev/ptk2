@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %} главная страница {% endblock %}
+
+{% block content %}
+    {% for task in task_list %}
+        <h3>{{ task['title'] }}</h3>
+        <p>Статус: {{ "✅" if task['status'] == "выполнено" else "❌" }}</p>
+    {% endfor %}
+{% endblock %}
